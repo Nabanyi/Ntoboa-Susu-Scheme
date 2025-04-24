@@ -23,7 +23,6 @@ public class RegisterRequest {
     private String firstname;
     
     @JsonProperty("middlename")
-    @NotEmpty(message = "Middle name is required")
     private String middlename;
     
     @JsonProperty("lastname")
