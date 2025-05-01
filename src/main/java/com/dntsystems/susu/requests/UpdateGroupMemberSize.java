@@ -4,17 +4,19 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 public class UpdateGroupMemberSize {
     @Schema(description = "New maximum number of members", example = "5")
-    private String maxMember;
+    private Integer maxMember;
 
     public UpdateGroupMemberSize() {
     }
 
-    public UpdateGroupMemberSize(String maxMember) {
+    public UpdateGroupMemberSize(Integer maxMember) {
         this.maxMember = maxMember;
     }
 
-    public String getMaxMember() {
+    public Integer getMaxMember() {
         return maxMember;
     }
-    public void setMaxMember(String maxMember) {}
+    public void setMaxMember(Integer maxMember) {
+        this.maxMember = maxMember;
+    }
 }

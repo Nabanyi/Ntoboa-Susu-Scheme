@@ -123,6 +123,16 @@ public class GroupService {
         groupDetailsDTO.setGroup(groupDTO);
         groupDetailsDTO.setMembers(userDTOList);
 
+        //get group policies
+        List<GroupPolicy> policies = groupPolicyRepository.findAllByGroupId(groupId);
+        List<GetGroupPolicyDTO> policyDTOS = policies.stream().map((policy) -> {
+                    GetGroupPolicyDTO dto = new GetGroupPolicyDTO();
+                    BeanUtils.copyProperties(policy, dto);
+                    return dto;
+                }).sorted((a, b) -> a.getPriority().compareTo(b.getPriority()))
+                .collect(Collectors.toList());
+
+        groupDetailsDTO.setPolicies(policyDTOS);
         return groupDetailsDTO;
     }
 
@@ -153,16 +163,17 @@ public class GroupService {
     //update group details
     public GetGroupDTO updateGroup(CreateGroupRequest request, Integer groupId) {
         if (!getGroupRole(groupId, helper.getUserId()).equals("ADMIN"))  throw new RuntimeException("You are not an admin of this group!");
-        if (groupRepository.existsById(groupId))  throw new RuntimeException("Group details not found!");
-        if (groupRepository.existsByIdAndName(groupId, request.getName()))  throw new RuntimeException("Group name is already taken!");
+        if (!groupRepository.existsById(groupId))  throw new RuntimeException("Group details not found!");
+        if (groupRepository.findByNameAndIdNot(request.getName(), groupId) != null)  throw new RuntimeException("Group name is already taken!");
 
-        Group newGroup = new Group();
-        newGroup.setName(request.getName());
-        newGroup.setDescription(request.getDescription());
-        newGroup.setCreatedBy(helper.getUserId().toString());
-        newGroup.setId(groupId);
+        Group savedGroup = groupRepository.findSingleGroup(groupId);
+        savedGroup.setName(request.getName());
+        savedGroup.setDescription(request.getDescription());
+        savedGroup.setUpdatedBy(helper.getUserId().toString());
+        savedGroup.setId(groupId);
+        savedGroup.setUpdatedAt(LocalDateTime.now());
 
-        Group createdGroup = groupRepository.save(newGroup);
+        Group createdGroup = groupRepository.save(savedGroup);
         GetGroupDTO groupDTO = new GetGroupDTO();
         BeanUtils.copyProperties(createdGroup, groupDTO);
         return groupDTO;
@@ -194,16 +205,17 @@ public class GroupService {
     }
 
     //update group member-size
-    public void updateGroupMemberSize(String max_member, Integer groupId) {
+    public void updateGroupMemberSize(Integer max_member, Integer groupId) {
         if (!getGroupRole(groupId, helper.getUserId()).equals("ADMIN"))  throw new RuntimeException("You are not an admin of this group!");
         if (!groupRepository.existsById(groupId))  throw new RuntimeException("Group details not found!");
 
-        Group newGroup = new Group();
-        newGroup.setMemberSize(Integer.parseInt(max_member));
-        newGroup.setUpdatedBy(helper.getUserId().toString());
-        newGroup.setId(groupId);
+        Group updateGroup = groupRepository.findSingleGroup(groupId);
+        updateGroup.setMemberSize(max_member);
+        updateGroup.setUpdatedBy(helper.getUserId().toString());
+        updateGroup.setUpdatedAt(LocalDateTime.now());
+        updateGroup.setId(groupId);
 
-        groupRepository.save(newGroup);
+        groupRepository.save(updateGroup);
     }
 
     //accept user group join request

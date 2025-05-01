@@ -5,6 +5,7 @@ import java.util.List;
 public class GetGroupDetailsDTO {
     private GetGroupDTO group;
     private List<GetUserDTO> members;
+    private List<GetGroupPolicyDTO> policies;
 
     public GetGroupDetailsDTO() {
     }
@@ -22,5 +23,13 @@ public class GetGroupDetailsDTO {
 
     public void setMembers(List<GetUserDTO> members) {
         this.members = members;
+    }
+
+    public List<GetGroupPolicyDTO> getPolicies() {
+        return policies;
+    }
+
+    public void setPolicies(List<GetGroupPolicyDTO> policies) {
+        this.policies = policies;
     }
 }

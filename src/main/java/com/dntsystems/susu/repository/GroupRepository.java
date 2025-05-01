@@ -20,4 +20,7 @@ public interface GroupRepository extends JpaRepository<Group, Integer> {
     boolean existsByIdAndName(Integer groupId, String name);
 
     List<Group> findByIdIn(List<Integer> groupIds);
+
+    @Query("SELECT g FROM Group g WHERE g.name = ?1 AND g.id != ?2")
+    Group findByNameAndIdNot(String name, Integer id);
 }

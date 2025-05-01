@@ -54,7 +54,7 @@ public class GroupsController {
     @Operation(summary = "Update Group", description = "Update existing group details")
     @PostMapping("/update/{groupId}")
     public ApiResponse<GetGroupDTO> updateGroup(@RequestBody CreateGroupRequest request, @PathVariable Integer groupId) {
-        return new ApiResponse<>(true, "Group updated successfully", groupService.updateGroup(request, groupId));
+        return new ApiResponse<>(true, "Group details updated successfully", groupService.updateGroup(request, groupId));
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -77,6 +77,7 @@ public class GroupsController {
     @Operation(summary = "Update Group Member Size", description = "Update maximum number of members allowed in group")
     @PostMapping("/member-size/{groupId}")
     public ApiResponse<Void> updateGroupMemberSize(@RequestBody UpdateGroupMemberSize req, @PathVariable Integer groupId) {
+        System.out.println("max_member: " + req.getMaxMember() + " group_id: " + groupId);
         groupService.updateGroupMemberSize(req.getMaxMember(), groupId);
         return new ApiResponse<>(true, "Group member size updated successfully", null);
     }
