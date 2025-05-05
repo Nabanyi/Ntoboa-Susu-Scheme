@@ -1,12 +1,11 @@
 package com.dntsystems.susu.service;
 
 import com.dntsystems.susu.dto.GetPaymentCycleDTO;
+import com.dntsystems.susu.dto.PaymentContributionDTO;
 import com.dntsystems.susu.dto.PaymentCycleMembers;
 import com.dntsystems.susu.entity.*;
-import com.dntsystems.susu.repository.GroupMembershipRepository;
-import com.dntsystems.susu.repository.PaymentCycleRepository;
-import com.dntsystems.susu.repository.PaymentOrderRepository;
-import com.dntsystems.susu.repository.UserRepository;
+import com.dntsystems.susu.repository.*;
+import com.dntsystems.susu.requests.CreatePaymentContributionDTO;
 import com.dntsystems.susu.requests.CreatePaymentCycleRequest;
 import com.dntsystems.susu.utils.Helper;
 
@@ -33,6 +32,8 @@ public class PaymentService {
     private UserRepository userRepository;
     @Autowired
     private Helper helper;
+    @Autowired
+    private PaymentContributionRepository paymentContributionRepository;
 
     private LocalDate calculateStartDateInDays(Integer userPosition, String frequency, LocalDate startDate){
         Integer startDateInDays = switch (frequency) {
@@ -146,7 +147,6 @@ public class PaymentService {
         BeanUtils.copyProperties(cycle, dto);
 
         List<PaymentOrder> orders = paymentOrderRepository.findByCycleId(cycle.getId());
-
         List<Long> userIds = orders.stream()
                 .map(PaymentOrder::getMemberId)
                 .map(Integer::longValue)
@@ -230,4 +230,47 @@ public class PaymentService {
         return cycleMember;
     }
 
+    public List<PaymentContributionDTO> getPaymentCycleContribution(Integer groupId, Integer cycleId) {
+        PaymentCycle cycle = paymentCycleRepository.findById(cycleId).orElseThrow(() -> new RuntimeException("Payment cycle details not found!"));
+
+        List<PaymentOrder> orders = paymentOrderRepository.findByCycleId(cycle.getId());
+        List<Long> userIds = orders.stream()
+                .map(PaymentOrder::getMemberId)
+                .map(Integer::longValue)
+                .toList();
+        List<User> users = userRepository.findAllById(userIds);
+
+        List<PaymentContribution> payments = paymentContributionRepository.findAllByCycleIdAndGroupId(cycleId, groupId);
+        Map<Integer, PaymentContribution> paymentMap = payments.stream().collect(Collectors.toMap(PaymentContribution::getMemberId, payment -> payment));
+
+        List<PaymentContributionDTO> contributions = new ArrayList<>();
+        for (User u : users) {
+            PaymentContribution payment = paymentMap.get(u.getId().intValue());
+            PaymentContributionDTO contribution = new PaymentContributionDTO();
+            contribution.setAmount(payment.getAmount());
+            contribution.setCycleId(cycleId);
+            contribution.setGroupId(groupId);
+            contribution.setMemberId(u.getId().intValue());
+            contribution.setFirstName(u.getFirstname());
+            contribution.setLastName(u.getLastname());
+            contributions.add(contribution);
+        }
+        return contributions;
+    }
+
+    public void makePayment(CreatePaymentContributionDTO payment) {
+        PaymentCycle cycle = paymentCycleRepository.findById(payment.getCycleId()).orElseThrow(() -> new RuntimeException("Payment cycle details not found!"));
+        if (!cycle.getStatus().equals("IN-PROGRESS"))
+            throw new RuntimeException("Payment cycle is not in progress!");
+        if (Objects.equals(cycle.getAmount(), payment.getAmount()))
+            throw new RuntimeException("Payment amount is the same as the payout amount!. Please refer to the payment cycle details");
+
+        PaymentContribution contribution = new PaymentContribution();
+        contribution.setAmount(payment.getAmount());
+        contribution.setCycleId(payment.getCycleId());
+        contribution.setMemberId(payment.getMemberId());
+        contribution.setGroupId(payment.getGroupId());
+
+        paymentContributionRepository.save(contribution);
+    }
 }

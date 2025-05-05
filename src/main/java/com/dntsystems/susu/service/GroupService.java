@@ -1,9 +1,6 @@
 package com.dntsystems.susu.service;
 
-import com.dntsystems.susu.dto.GetGroupDTO;
-import com.dntsystems.susu.dto.GetGroupDetailsDTO;
-import com.dntsystems.susu.dto.GetGroupPolicyDTO;
-import com.dntsystems.susu.dto.GetUserDTO;
+import com.dntsystems.susu.dto.*;
 import com.dntsystems.susu.entity.*;
 import com.dntsystems.susu.repository.*;
 import com.dntsystems.susu.requests.CreateGroupPolicyRequest;

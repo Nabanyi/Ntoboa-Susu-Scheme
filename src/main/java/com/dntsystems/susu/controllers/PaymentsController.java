@@ -1,6 +1,8 @@
 package com.dntsystems.susu.controllers;
 
 import com.dntsystems.susu.dto.GetPaymentCycleDTO;
+import com.dntsystems.susu.dto.PaymentContributionDTO;
+import com.dntsystems.susu.requests.CreatePaymentContributionDTO;
 import com.dntsystems.susu.requests.CreatePaymentCycleRequest;
 import com.dntsystems.susu.service.PaymentService;
 import com.dntsystems.susu.utils.ApiResponse;
@@ -61,5 +63,20 @@ public class PaymentsController {
     public ApiResponse<Void> closePaymentCycle(@PathVariable Integer cycleId) {
         paymentService.closePaymentCycle(cycleId);
         return new ApiResponse<>(true, "Payment cycle closed successfully", null);
+    }
+
+    @Operation(summary = "Get Payment Contributions", description = "Get all payment contribution for a payment cycle")
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/cycle/{cycleId}/{groupId}")
+    public ApiResponse<List<PaymentContributionDTO>> getPaymentCycleContribution(@PathVariable Integer cycleId, @PathVariable Integer groupId) {
+        return new ApiResponse<>(true, "Payment contributions retrieved successfully", paymentService.getPaymentCycleContribution(groupId, cycleId));
+    }
+
+    @Operation(summary = "Make Payment", description = "Make payment for a payment cycle")
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/cycle/make-payment")
+    public ApiResponse<Void> makeCyclePayment(@RequestBody CreatePaymentContributionDTO createPaymentContributionDTO) {
+        paymentService.makePayment(createPaymentContributionDTO);
+        return new ApiResponse<>(true, "Payment successfully made", null);
     }
 }
