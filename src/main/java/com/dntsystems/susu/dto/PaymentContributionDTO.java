@@ -1,5 +1,7 @@
 package com.dntsystems.susu.dto;
 
+import java.time.LocalDateTime;
+
 public class PaymentContributionDTO {
     private String firstName;
     private String lastName;
@@ -7,6 +9,7 @@ public class PaymentContributionDTO {
     private Integer cycleId;
     private Integer memberId;
     private Double amount;
+    private LocalDateTime createdAt;
 
     public PaymentContributionDTO() {
     }
@@ -57,5 +60,13 @@ public class PaymentContributionDTO {
 
     public void setAmount(Double amount) {
         this.amount = amount;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 }

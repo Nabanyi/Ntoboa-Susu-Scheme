@@ -51,7 +51,7 @@ public class PaymentsController {
 
     @Operation(summary = "Start payment cycle", description = "Start a payment cycle for group")
     @PreAuthorize("isAuthenticated()")
-    @PostMapping("/cycle/{cycleId}/start")
+    @GetMapping("/cycle/{cycleId}/start")
     public ApiResponse<Void> startPaymentCycle(@PathVariable Integer cycleId) {
         paymentService.startPaymentCycle(cycleId);
         return new ApiResponse<>(true, "Payment cycle started successfully", null);
@@ -59,7 +59,7 @@ public class PaymentsController {
 
     @Operation(summary = "Close payment cycle", description = "Close or end a payment cycle for a group")
     @PreAuthorize("isAuthenticated()")
-    @PostMapping("/cycle/{cycleId}/close")
+    @GetMapping("/cycle/{cycleId}/close")
     public ApiResponse<Void> closePaymentCycle(@PathVariable Integer cycleId) {
         paymentService.closePaymentCycle(cycleId);
         return new ApiResponse<>(true, "Payment cycle closed successfully", null);

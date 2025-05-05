@@ -247,12 +247,20 @@ public class PaymentService {
         for (User u : users) {
             PaymentContribution payment = paymentMap.get(u.getId().intValue());
             PaymentContributionDTO contribution = new PaymentContributionDTO();
-            contribution.setAmount(payment.getAmount());
+            if (payment == null){
+                contribution.setAmount(0.0);
+                contribution.setCreatedAt(null);
+            }else{
+                contribution.setCreatedAt(payment.getCreatedAt());
+                contribution.setAmount(payment.getAmount());
+            }
+
             contribution.setCycleId(cycleId);
             contribution.setGroupId(groupId);
             contribution.setMemberId(u.getId().intValue());
             contribution.setFirstName(u.getFirstname());
             contribution.setLastName(u.getLastname());
+
             contributions.add(contribution);
         }
         return contributions;
@@ -262,7 +270,7 @@ public class PaymentService {
         PaymentCycle cycle = paymentCycleRepository.findById(payment.getCycleId()).orElseThrow(() -> new RuntimeException("Payment cycle details not found!"));
         if (!cycle.getStatus().equals("IN-PROGRESS"))
             throw new RuntimeException("Payment cycle is not in progress!");
-        if (Objects.equals(cycle.getAmount(), payment.getAmount()))
+        if (!Objects.equals(cycle.getAmount(), payment.getAmount()))
             throw new RuntimeException("Payment amount is the same as the payout amount!. Please refer to the payment cycle details");
 
         PaymentContribution contribution = new PaymentContribution();
