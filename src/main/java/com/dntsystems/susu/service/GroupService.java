@@ -50,7 +50,15 @@ public class GroupService {
         Map<Long, User> userMap = users.stream()
                 .collect(Collectors.toMap(User::getId, user -> user));
 
-        return groupList.stream().map((group) -> {
+        List<GroupMembership> userMemberList = groupMembershipRepository.userCreatedGroups(helper.getUserId());
+        List<Integer> groupIds = new ArrayList<>();
+        userMemberList.forEach((group) -> {
+            groupIds.add(group.getGroupId());
+        });
+
+        return groupList.stream()
+                .filter(group -> !groupIds.contains(group.getId()))
+                .map((group) -> {
             GetGroupDTO dto = new GetGroupDTO();
             BeanUtils.copyProperties(group, dto);
             User user = userMap.get(Long.parseLong(group.getCreatedBy()));
@@ -230,7 +238,7 @@ public class GroupService {
 
         Group group = groupRepository.findById(groupId).orElseThrow(() -> new RuntimeException("Group details not found!"));
         long groupMembersCount = groupMembershipRepository.countByGroupId(groupId);
-        if (group.getMemberSize() >= groupMembersCount) {
+        if (groupMembersCount  >= group.getMemberSize()) {
             throw new RuntimeException("Sorry this group is full! Please try again later or contact the group admin to increase the group member size.");
         }
 
