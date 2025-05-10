@@ -271,7 +271,7 @@ public class PaymentService {
         if (!cycle.getStatus().equals("IN-PROGRESS"))
             throw new RuntimeException("Payment cycle is not in progress!");
         if (!Objects.equals(cycle.getAmount(), payment.getAmount()))
-            throw new RuntimeException("Payment amount is the same as the payout amount!. Please refer to the payment cycle details");
+            throw new RuntimeException("Payment amount is the same as the payout amount!. Please refer to the payment cycle details or your group admin");
 
         PaymentContribution contribution = new PaymentContribution();
         contribution.setAmount(payment.getAmount());
