@@ -201,7 +201,7 @@ public class PaymentService {
         PaymentCycle cycle = paymentCycleRepository.findById(cycleId).orElseThrow(() -> new RuntimeException("Payment cycle details not found!"));
 
         if (!getGroupRole(cycle.getGroupId(), helper.getUserId()).equals("ADMIN"))
-            throw new RuntimeException("You are not an admin of this group!");
+            throw new RuntimeException("You are not an admin of this group, only admins can perform this action!");
 
         cycle.setStatus("IN-PROGRESS");
         paymentCycleRepository.save(cycle);
