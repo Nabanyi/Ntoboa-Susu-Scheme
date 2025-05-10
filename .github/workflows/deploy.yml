@@ -19,7 +19,7 @@ jobs:
           java-version: '21'
 
       - name: Build with Gradle
-        run: ./gradlew clean build -x test
+        run: ./gradlew clean bootJar
 
       - name: Zip JAR for Beanstalk
         run: |
