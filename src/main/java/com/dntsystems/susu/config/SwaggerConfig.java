@@ -2,6 +2,7 @@ package com.dntsystems.susu.config;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import io.swagger.v3.oas.models.Components;
@@ -13,11 +14,13 @@ import io.swagger.v3.oas.models.servers.Server;
 
 @Configuration
 public class SwaggerConfig {
+    @Value("${openapi.server-url}")
+    private String openApiServerUrl;
 
     @Bean
     OpenAPI customOpenAPI() {
         Server server = new Server();
-        server.setUrl("http://localhost:8010/"); // URL through the gateway
+        server.setUrl(openApiServerUrl);
         server.setDescription("Susu APIs");
 
         return new OpenAPI()

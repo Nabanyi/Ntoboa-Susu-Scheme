@@ -147,6 +147,7 @@ public class GroupService {
             throw new RuntimeException("Group name already taken!");
         }
 
+
         Group newGroup = new Group();
         newGroup.setName(group.getName());
         newGroup.setDescription(group.getDescription());
